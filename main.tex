@@ -1,0 +1,485 @@
+\documentclass[11pt,reqno]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[margin=1.05in]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[colorlinks=true,breaklinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+
+\numberwithin{equation}{section}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\supp}{\operatorname{supp}}
+
+\title[Fourier Endpoint Minimax and Deficit Rank Bounds]{Fourier Endpoint Minimax and Autocorrelation-Deficit\\Rank Bounds for Finite Abelian Character Tables}
+
+\author[D. Kuttymbek]{Daniyar Kuttymbek}
+\address{Astana, Kazakhstan}
+\email{daniyar.kuttymbek@gmail.com}
+
+\author[A. Kuttymbek]{Adilkhan Kuttymbek}
+\address{Astana, Kazakhstan}
+\email{adilkhan.kuttymbek@gmail.com}
+
+\author[D. Kuttymbek]{Dayana Kuttymbek}
+\address{Astana, Kazakhstan}
+\email{dayanamiu74@gmail.com}
+
+\author[A. Kolpenova]{Amina Kolpenova}
+\address{Astana, Kazakhstan}
+\email{aminakolpenova@gmail.com}
+
+\author[M. Kottumbekov]{Mukhammadali Kottumbekov}
+\address{Astana, Kazakhstan}
+\email{mukhammadalikottumbek@gmail.com}
+
+\date{\today}
+\subjclass[2020]{Primary 15A03, 42A99; Secondary 15B10, 05E16, 65T50}
+\keywords{Discrete Fourier matrix, quasiseparable order, bit-reversal permutation, rank-deficient submatrices, finite abelian character tables, translation autocorrelation, low-rank approximation gap}
+
+\begin{document}
+
+\begin{abstract}
+For an $N\times N$ matrix $A$, let $q(A)=\max_{1\le k<N}\max\{\rank A[0{:}k,\,k{:}N],\,\rank A[k{:}N,\,0{:}k]\}$ denote its quasiseparable order (maximum strict off-diagonal corner rank across a coordinate cut). We prove two sharp structural results for discrete Fourier matrices and finite abelian character tables.
+
+First, for every dyadic order $N=2^m$ ($m\ge 0$) and over any characteristic-zero field containing a primitive $N$-th root of unity, the minimum of $q(P_\rho F_N P_\sigma^T)$ over all \emph{independent} row and column permutations $\rho,\sigma\in S_N$ equals $0$ ($N=1$), $1$ ($N\in\{2,4\}$), and exactly $N/4+1$ for every $N\ge 8$. Double bit-reversal attains the minimum at every size via an exact cut-rank recurrence $r_N(k)=\lceil k/2\rceil + r_{N/4}(\lfloor k/2\rfloor)$ with reflection symmetry $r_N(k)=r_N(N-k)$. In contrast, the minimum rank of an arbitrary $(N/2)\times(N/2)$ submatrix is $N/4$ (for $N\ge 4$), showing that the $+1$ shift is forced specifically by the offset $(N/2-1)\times(N/2+1)$ corner.
+
+Second, for the unitary character table $U$ of \emph{any} finite abelian group $G$ of order $N\ge 2$ and arbitrary nonempty subsets $R\subseteq\widehat{G}$, $H\subseteq G$ of sizes $r,h$, let $d_H = h - \max_{s\neq 0}|H\cap(H-s)|$ be the translation autocorrelation deficit and $B_H = h(N-r)/N - d_H r(N-r)/N^2$. Using the second moment of the complementary Gram contraction, we prove the exact rank improvement
+\[
+\rank U[R,H] \ge \left\lceil \frac{rh}{N} + \frac{d_H r(N-r)}{N^2}\right\rceil
+\]
+together with the explicit interior singular-value and low-rank operator-norm approximation gap $\|U[R,H]-W\|_2 \ge \sigma_{t+1}(U[R,H]) \ge \bigl(1-\sqrt{B_H/(h-t)}\bigr)^{1/2} > 0$ for every $0\le t < h-B_H$ and $\rank W\le t$, along with the dual transposed orientation. As consequences we obtain strict improvements over the classical flat-unitary bound $\lceil rh/N\rceil$ for non-stabilized sets in $p$-groups, an explicit $\Omega(N^{-1/2})$ critical-corner singular-value gap for all abelian $2$-groups, exact minimum upper-cut rank sums at $N\le 16$, and a closed-form $N^2/6 + O(N\log N)$ bit-reversal cut-rank sum.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction and main results}
+\label{sec:intro}
+
+For a finite set $E$, let $\C^E$ carry the standard Hermitian inner product. For a matrix $A$ indexed by $E\times D$ and subsets $R\subseteq E$, $H\subseteq D$, denote by $A[R,H]$ the induced submatrix. Reordering rows or columns leaves rank and singular values unchanged; an empty submatrix has rank $0$. Write $[N]=\{0,\ldots,N-1\}$, and for a permutation $\rho\in S_N$ let $(P_\rho x)_i = x_{\rho(i)}$, so that $(P_\rho A P_\sigma^T)_{ij}=A_{\rho(i),\sigma(j)}$.
+
+For an $N\times N$ matrix $A$, its \emph{quasiseparable order} (see~\cite{PSV23}) is the maximum strict off-diagonal corner rank across a coordinate cut:
+\begin{equation}
+\label{eq:q-def}
+q(A) = \max_{1\le k<N}\max\bigl\{\rank A[0{:}k,\, k{:}N],\; \rank A[k{:}N,\, 0{:}k]\bigr\},
+\end{equation}
+using half-open interval notation $0{:}k=\{0,\ldots,k-1\}$ and $k{:}N=\{k,\ldots,N-1\}$, with $q(A)=0$ for $N=1$. Define the unnormalized cyclic discrete Fourier matrix and its unitary normalization by
+\begin{equation}
+\label{eq:FN-def}
+F_N = (\omega_N^{ab})_{a,b\in[N]},\qquad \omega_N = e^{2\pi i/N},\qquad U_N = N^{-1/2}F_N.
+\end{equation}
+More generally, for any finite abelian group $G$ of order $N$ (written additively) with dual group $\widehat{G}$, define its unitary character table
+\begin{equation}
+\label{eq:char-table}
+U_{\chi,x} = N^{-1/2}\chi(x),\qquad \chi\in\widehat{G},\ x\in G.
+\end{equation}
+Throughout, $\|\cdot\|_2$ denotes the spectral (operator) norm and $\|\cdot\|_F$ the Frobenius norm; singular values $\sigma_1(V)\ge \cdots\ge \sigma_h(V)\ge 0$ of $V\in\C^{r\times h}$ are the descending square roots of the $h$ eigenvalues of $V^*V$ (padded with zeros if $h>r$).
+
+Our first main theorem determines the exact minimum quasiseparable order of $F_{2^m}$ over all \emph{independent} row and column permutations, and contrasts it with the minimum rank of an arbitrary half-size square.
+
+\begin{theorem}[Cyclic dyadic endpoint minimax]
+\label{thm:minimax}
+Let $N=2^m$ with $m\ge 0$. Over $\C$,
+\begin{equation}
+\label{eq:minimax-val}
+\min_{\rho,\sigma\in S_N} q(P_\rho F_N P_\sigma^T) =
+\begin{cases}
+0, & N=1,\\
+1, & N\in\{2,4\},\\
+N/4 + 1, & N\ge 8.
+\end{cases}
+\end{equation}
+For every $m\ge 0$, bit-reversal applied at both endpoints ($\rho=\sigma=b_m$) attains the minimum. The same exact equality~\eqref{eq:minimax-val} holds over every characteristic-zero field $K$ containing a primitive $N$-th root of unity $\zeta$ (with $\zeta$ in place of $\omega_N$, without requiring $\sqrt{N}\in K$).
+
+Separately, for every $N=2^m\ge 4$ (indeed for every $N$ divisible by $4$),
+\begin{equation}
+\label{eq:half-sq}
+\min_{|R|=|H|=N/2} \rank F_N[R,H] = \frac{N}{4},
+\end{equation}
+while for $N=2$ the half-square minimum is $1$.
+\end{theorem}
+
+The mechanism driving the $+1$ shift in~\eqref{eq:minimax-val} generalizes far beyond cyclic $2$-groups and critical corners: it is governed by the \emph{translation autocorrelation deficit} of the selected column (or row) set inside any finite abelian group.
+
+\begin{theorem}[Finite-abelian autocorrelation-deficit rank and approximation gap]
+\label{thm:deficit}
+Let $G$ be a finite abelian group of order $N\ge 2$, let $U$ be its unitary character table~\eqref{eq:char-table}, and let $R\subseteq\widehat{G}$, $H\subseteq G$ be nonempty subsets of sizes $r=|R|$ and $h=|H|$. Set $V=U[R,H]$ and define
+\begin{equation}
+\label{eq:deficit-defs}
+c_H(s) = |H\cap(H-s)|,\qquad
+d_H = h - \max_{s\in G\setminus\{0\}} c_H(s),\qquad
+B_H = \frac{h(N-r)}{N} - \frac{d_H r(N-r)}{N^2}.
+\end{equation}
+Then:
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item \emph{(Rank bound)}
+\begin{equation}
+\label{eq:deficit-rank}
+\rank V \ge \left\lceil \frac{rh}{N} + \frac{d_H r(N-r)}{N^2}\right\rceil.
+\end{equation}
+\item \emph{(Interior singular-value and operator-norm gap)} For every integer $0\le t < h - B_H$ and every matrix $W\in\C^{r\times h}$ with $\rank W\le t$,
+\begin{equation}
+\label{eq:deficit-gap}
+\|V - W\|_2 \ge \sigma_{t+1}(V) \ge \left(1 - \sqrt{\frac{B_H}{h - t}}\right)^{1/2} > 0.
+\end{equation}
+\item \emph{(Dual orientation)} Defining $d_R = r - \max_{\psi\in\widehat{G}\setminus\{0\}} |R\cap(R-\psi)|$ and $B_R = r(N-h)/N - d_R h(N-h)/N^2$, the transposed bounds
+\begin{equation}
+\label{eq:deficit-dual}
+\rank V \ge \left\lceil \frac{rh}{N} + \frac{d_R h(N-h)}{N^2}\right\rceil,\qquad
+\sigma_{t+1}(V) \ge \left(1 - \sqrt{\frac{B_R}{r - t}}\right)^{1/2} > 0\quad (0\le t < r - B_R)
+\end{equation}
+hold simultaneously.
+\end{enumerate}
+\end{theorem}
+
+The classical flat-unitary bound $\rank V \ge \lceil rh/N\rceil$ (see~\cite{deW06}) corresponds to dropping the nonnegative term $d_H r(N-r)/N^2$ in~\eqref{eq:deficit-rank}. Whenever $H$ has no nontrivial translation stabilizer ($d_H\ge 1$) and $1\le r<N$, Theorem~\ref{thm:deficit} strictly strengthens the moment estimate and produces an explicit positive lower bound on interior singular values.
+
+The paper is organized as follows. Section~\ref{sec:minimax} proves Theorem~\ref{thm:minimax}, establishing the universal $(2L-1)\times(2L+1)$ critical-rectangle obstruction, the exact bit-reversal cut-rank recurrence and reflection symmetry, the half-square boundary, and the characteristic-zero field extension. Section~\ref{sec:deficit} proves Theorem~\ref{thm:deficit} and records degenerate, singleton, and unnormalized-table scaling cases. Section~\ref{sec:consequences} deduces corollaries for $p$-group blocks, abelian $2$-group critical gaps, and upper-cut rank sums (exact through $N=16$, closed form for double bit-reversal, and the explicit gap at $N=32$). Section~\ref{sec:prior} situates both theorems within the matrix-rank and harmonic-analysis literature and states open problems.
+
+\section{The cyclic dyadic endpoint minimax theorem}
+\label{sec:minimax}
+
+We prove Theorem~\ref{thm:minimax} in four steps: the universal lower bound, the exact bit-reversal recurrence, reflection and attainment of the maximum, and the half-square / characteristic-zero statements.
+
+\subsection{Universal critical-rectangle lower bound}
+
+Write $N = 4L$ with $L\ge 2$ (so $N=2^m\ge 8$). Take \emph{arbitrary} subsets $R,H\subseteq\Z/N\Z$ with
+\[
+|R| = 2L - 1,\qquad |H| = 2L + 1 =: h.
+\]
+Let $I = (\Z/N\Z)\setminus R$ (so $|I|=h$), and define
+\[
+V = U_N[R,H],\qquad A = U_N[I,H]^* U_N[I,H].
+\]
+Because the columns of $U_N$ are orthonormal,
+\begin{equation}
+\label{eq:gram-comp}
+0 \le A \le I_h,\qquad V^*V = I_h - A.
+\end{equation}
+Hence $\ker V$ is precisely the eigenvalue-$1$ eigenspace of the positive contraction $A$. Since every eigenvalue of $A$ lies in $[0,1]$, the nullity $d := \dim\ker V$ satisfies $d \le \tr(A^2)$.
+
+Put $f_I(s) = \sum_{a\in I}\omega_N^{as}$. For $x,y\in H$, the $(x,y)$ entry of $A$ is $N^{-1}f_I(y-x)$. Since $A$ is Hermitian, grouping ordered pairs $(x,y)\in H\times H$ by their difference $s=y-x$ gives the exact second-moment identity
+\begin{equation}
+\label{eq:trace-moment}
+\tr(A^2) = \sum_{x,y\in H}|A_{xy}|^2 = \frac{1}{N^2}\sum_{s\in\Z/N\Z} c_H(s)|f_I(s)|^2,
+\end{equation}
+where $c_H(s) = |H\cap(H-s)|$. Clearly $c_H(0)=h$. For any $s\neq 0$ in the $2$-group $\Z/2^m\Z$, translation $x\mapsto x+s$ has order a positive power of $2$ (hence even), partitioning $\Z/2^m\Z$ into orbits of even length. Any subset invariant under $x\mapsto x+s$ is a union of such orbits and therefore has even cardinality. Because $h=2L+1$ is odd, $H$ cannot be invariant under any nonzero translation, so $c_H(s)\le h-1$ for every $s\neq 0$.
+
+By character orthogonality, $\sum_{s\in\Z/N\Z}|f_I(s)|^2 = N|I| = Nh$ and $f_I(0)=h$. Substituting $c_H(0)=h$ and $c_H(s)\le h-1$ ($s\neq 0$) into~\eqref{eq:trace-moment} yields
+\begin{equation}
+\label{eq:BL-bound}
+\begin{aligned}
+\tr(A^2)
+&\le \frac{h\cdot h^2 + (h-1)(Nh - h^2)}{N^2}
+ = \frac{Nh(h-1) + h^2}{N^2}\\
+&= \frac{4L(2L+1)(2L) + (2L+1)^2}{16L^2}
+ = L + \frac{3}{4} + \frac{1}{4L} + \frac{1}{16L^2} =: B_L < L + 1.
+\end{aligned}
+\end{equation}
+The strict inequality $B_L < L+1$ is equivalent to $4L^2 - 4L - 1 > 0$, which holds for every integer $L\ge 2$ (since $4L(L-1) \ge 8 > 1$). Because $d=\dim\ker V$ is an integer, $d\le L$, so every $(2L-1)\times(2L+1)$ submatrix of $F_N$ satisfies
+\begin{equation}
+\label{eq:crit-rank}
+\rank F_N[R,H] = h - d \ge (2L+1) - L = L + 1 = \frac{N}{4} + 1.
+\end{equation}
+For \emph{any} independent permutations $\rho,\sigma\in S_N$, the upper-right corner $(P_\rho F_N P_\sigma^T)[0{:}k,\,k{:}N]$ at cut $k = 2L-1$ is a $(2L-1)\times(2L+1)$ submatrix of $F_N$. Therefore~\eqref{eq:crit-rank} proves $\min_{\rho,\sigma\in S_N} q(P_\rho F_N P_\sigma^T) \ge N/4 + 1$ for all $N=2^m\ge 8$.
+
+\subsection{Exact bit-reversal cut-rank recurrence}
+
+For $m\ge 0$ and $0\le j < 2^m$, let $b_m(j)\in[2^m]$ be the integer obtained by reversing the $m$ binary digits of $j$ (with $b_0(0)=0$). Define the doubly bit-reversed Fourier matrix and its upper-cut rank profile by
+\[
+Q_N[i,j] = \omega_N^{b_m(i)b_m(j)},\qquad
+r_N(k) = \rank Q_N[0{:}k,\, k{:}N]\quad (0\le k\le N),
+\]
+with $r_N(0)=r_N(N)=0$.
+
+\begin{lemma}[Bit-reversal cut-rank recurrence]
+\label{lem:bitrev-rec}
+For every $N=4L=2^m\ge 4$ ($m\ge 2$) and every integer $0\le k\le 2L$,
+\begin{equation}
+\label{eq:bitrev-rec}
+r_N(k) = \lceil k/2\rceil + r_L(\lfloor k/2\rfloor),
+\end{equation}
+where $r_L$ is evaluated on $Q_L$ with primitive $L$-th root $\omega_L = \omega_N^4$ (including $Q_1=[1]$ with $r_1(0)=r_1(1)=0$).
+\end{lemma}
+
+\begin{proof}
+The first $2L$ bit-reversed indices $b_m(0),\ldots,b_m(2L-1)$ are precisely the even integers in $[4L]$ (their most significant bit in binary is $0$, so their least significant bit after reversal is $0$). Write $b_m(i) = 2q_i$ for $0\le i<2L$. Letting $z_j = b_{m-2}(j)$ for $0\le j<L$, inspecting the top two bits of $i$ gives
+\begin{equation}
+\label{eq:bitrev-pairs}
+q_{2j} = z_j,\qquad q_{2j+1} = L + z_j\qquad (0\le j<L).
+\end{equation}
+Set $p = \lfloor k/2\rfloor$ and $d = \lceil k/2\rceil$ (so $k = p + d$). The selected row indices $0,\ldots,k-1$ consist of $p$ complete pairs $\{2j,2j+1\}$ ($0\le j<p$), together with one unpaired index $2p$ if $k$ is odd. By~\eqref{eq:bitrev-pairs}, these $k$ rows span exactly $d$ distinct residues modulo $L$, namely $z_0,\ldots,z_{d-1}$.
+
+All $2L$ odd natural column labels $2\ell+1$ ($0\le\ell<2L$) occupy bit-reversed positions $2L,\ldots,4L-1$, so every odd column lies to the right of the cut $k\le 2L$. In row label $2q$, their entries are
+\[
+\omega_N^{(2q)(2\ell+1)} = \omega_{2L}^q\,\omega_L^{q\ell}.
+\]
+Note that replacing $q$ by $q+L$ multiplies $\omega_{2L}^q$ by $\omega_{2L}^L=-1$ while leaving $\omega_L^{q\ell}$ unchanged; thus rows $2j$ and $2j+1$ have \emph{opposite} entries on all odd columns. Selecting one representative from each of the $d$ distinct residues $z_0,\ldots,z_{d-1}$ and factoring out the nonzero row scalars $\omega_{2L}^{z_j}$ yields $d$ distinct rows of the full invertible Fourier matrix $F_L$ (repeated twice across $\ell\in[2L]$), which are linearly independent. Therefore the odd-column span $W_{\mathrm{odd}}\subseteq\C^k$ has dimension exactly $d$.
+
+Now define the surjective linear map $\pi:\C^k\to\C^p$ by adding each complete pair of coordinates and discarding the unpaired coordinate if $k$ is odd:
+\[
+(\pi v)_j = v_{2j} + v_{2j+1}\qquad (0\le j<p).
+\]
+Because paired rows have opposite entries on every odd column, $W_{\mathrm{odd}}\subseteq \ker\pi$. Since $\dim\ker\pi = k - p = d = \dim W_{\mathrm{odd}}$, we obtain $W_{\mathrm{odd}} = \ker\pi$. Passing to the quotient $\C^k/W_{\mathrm{odd}}$ is therefore canonically realized by applying $\pi$ to the remaining surviving columns.
+
+The remaining columns in $k{:}N$ are the surviving even columns at positions $k,\ldots,2L-1$. For any even column label $2\ell$, rows $2q$ and $2(q+L)$ have identical entries $\omega_N^{(2q)(2\ell)} = \omega_L^{q\ell}$, so applying $\pi$ multiplies by the nonzero scalar $2$ and maps this column to
+\[
+2\bigl(\omega_L^{z_j\ell}\bigr)_{0\le j<p}.
+\]
+By~\eqref{eq:bitrev-pairs}, the column positions $k,\ldots,2L-1$ yield modulo $L$ precisely the bit-reversed residues $z_p,\ldots,z_{L-1}$ (with multiplicity $2$ for complete pairs, and multiplicity $1$ for $z_p$ when $k=2p+1$ is odd because the second member $2p+1$ of the split pair still lies in $k{:}N$). Removing duplicate columns and the factor $2$ leaves precisely $Q_L[0{:}p,\, p{:}L]$, whose rank is $r_L(p)$. Thus
+\[
+r_N(k) = \dim W_{\mathrm{odd}} + \rank\pi\bigl(Q_N[0{:}k,\, k{:}N]\bigr) = d + r_L(p),
+\]
+including the boundary cases $p=0$ ($k\in\{0,1\}$) and $p=L$ ($k=2L$).
+\end{proof}
+
+\subsection{Reflection symmetry, upper bound, and small orders}
+
+Bit reversal commutes with complementation: $b_m(N-1-i) = N-1-b_m(i)$. Hence
+\[
+Q_N[N-1-i,\, N-1-j]
+= \omega_N^{(N-1-b_m(i))(N-1-b_m(j))}
+= \omega_N^{1 + b_m(i) + b_m(j)} Q_N[i,j].
+\]
+The prefactor $\omega_N^{1+b_m(i)+b_m(j)}$ is a product of invertible diagonal row and column scalings. Simultaneous index reversal maps the upper-right corner $Q_N[0{:}k,\, k{:}N]$ to the lower-left corner $Q_N[N-k{:}N,\, 0{:}N-k]$ (with reversed axes); since $Q_N$ is symmetric, upper and lower corner ranks at every cut coincide, and
+\begin{equation}
+\label{eq:reflection}
+r_N(k) = r_N(N - k)\qquad (0\le k\le N).
+\end{equation}
+
+For any $0\le k\le 2L$:
+\begin{itemize}[leftmargin=1.5em]
+\item If $k = 2a$ is even ($0\le a\le L$), Lemma~\ref{lem:bitrev-rec} and the column-count bound $r_L(a)\le L-a$ give $r_N(2a) = a + r_L(a) \le L$.
+\item If $k = 2a+1$ is odd ($0\le a\le L-1$), then $r_N(2a+1) = (a+1) + r_L(a) \le L + 1$.
+\end{itemize}
+By~\eqref{eq:reflection}, every cut $k\in\{1,\ldots,N-1\}$ satisfies $r_N(k)\le L+1$, so $q(Q_N)\le L+1 = N/4+1$. When $L\ge 2$, $r_L(L-1)=1$ (a nonempty single-column Fourier block has nonzero entries), so $r_N(2L-1) = L + r_L(L-1) = L+1$. Together with~\eqref{eq:crit-rank}, this proves~\eqref{eq:minimax-val} for all $N=2^m\ge 8$.
+
+For small orders: at $N=1$, there is no cut, so $q(F_1)=0$. At $N=2$, $Q_2$ has single cut rank $r_2(1)=1$. At $N=4$ ($L=1$), Lemma~\ref{lem:bitrev-rec} and~\eqref{eq:reflection} give $r_4(1)=1+r_1(0)=1$, $r_4(2)=1+r_1(1)=1$, $r_4(3)=1$, so $q(Q_4)=1$; since every Fourier matrix of size $N\ge 2$ has all entries nonzero, every cut $k=1$ has rank at least $1$, establishing $q_{\min}=1$ for $N\in\{2,4\}$.
+
+\subsection{Half-square minimum and characteristic-zero extension}
+
+For any $R,H\subseteq[N]$, coordinate restriction of the unitary matrix $U_N$ gives $\|U_N[R,H]\|_2\le 1$, while flatness gives $\|U_N[R,H]\|_F^2 = |R||H|/N$. Since the sum of squared singular values is at most $\rank(U_N[R,H])\cdot \|U_N[R,H]\|_2^2$,
+\begin{equation}
+\label{eq:flat-baseline}
+\rank F_N[R,H] = \rank U_N[R,H] \ge \frac{|R||H|}{N}.
+\end{equation}
+When $N=4L$ and $|R|=|H|=2L$,~\eqref{eq:flat-baseline} gives $\rank F_N[R,H]\ge L$. Taking $R=H=\{0,2,4,\ldots,4L-2\}$ yields entries $\omega_N^{(2a)(2b)} = \omega_L^{ab}$ ($0\le a,b<2L$), which is $F_L$ with every row and column repeated twice and hence has rank exactly $L=N/4$. This proves~\eqref{eq:half-sq} (while at $N=2$, every $1\times 1$ block is a nonzero scalar of rank $1$).
+
+Finally, let $K$ be any field of characteristic zero containing a primitive $N$-th root of unity $\zeta$. All entries of $F_N(\zeta)$ lie in the cyclotomic subfield $\Q(\zeta)\subseteq K$, and matrix rank is preserved under field extension (being determined by vanishing of minors). Embedding $\Q(\zeta)\hookrightarrow\C$ sends $\zeta$ to $\omega_N^a$ for some $a$ coprime to $N$; multiplying row labels by $a\bmod N$ is a permutation of $[N]$ that preserves $\min_{\rho,\sigma} q(P_\rho F_N P_\sigma^T)$ and $\min_{|R|=|H|=N/2}\rank F_N[R,H]$. Moreover, the proof of Lemma~\ref{lem:bitrev-rec} and~\eqref{eq:reflection} uses only that $\zeta$ has exact order $N$ and $2\neq 0$, so double bit-reversal attains the same profile over $K$ directly. This completes the proof of Theorem~\ref{thm:minimax}.
+
+\section{Finite-abelian autocorrelation-deficit rank and gap bounds}
+\label{sec:deficit}
+
+We now prove Theorem~\ref{thm:deficit} and analyze its boundary cases and normalization scaling.
+
+\begin{proof}[Proof of Theorem~\ref{thm:deficit}]
+Let $G$ be a finite abelian group of order $N\ge 2$, and let $R\subseteq\widehat{G}$, $H\subseteq G$ have sizes $1\le r,h\le N$. Put $I = \widehat{G}\setminus R$, $n = |I| = N - r$, $V = U[R,H]$, and
+\[
+A = U[I,H]^* U[I,H],\qquad f_I(s) = \sum_{\chi\in I}\chi(s)\quad (s\in G).
+\]
+Since the columns of the unitary character table $U$ are orthonormal, $0\le A\le I_h$ and $V^*V = I_h - A$. For $x,y\in H$,
+\[
+A_{xy} = \frac{1}{N}\sum_{\chi\in I}\overline{\chi(x)}\chi(y) = \frac{1}{N}f_I(y-x).
+\]
+Because $A$ is Hermitian, grouping pairs $(x,y)\in H\times H$ by $s=y-x\in G$ gives
+\begin{equation}
+\label{eq:abelian-moment}
+\tr(A^2) = \sum_{x,y\in H}|A_{xy}|^2 = \frac{1}{N^2}\sum_{s\in G} c_H(s)|f_I(s)|^2.
+\end{equation}
+By character orthogonality on $G$, $\sum_{s\in G}|f_I(s)|^2 = Nn$ and $f_I(0) = n$ (including $n=0$ when $r=N$). By definition~\eqref{eq:deficit-defs}, $c_H(0)=h$ and $c_H(s)\le h - d_H$ for every $s\in G\setminus\{0\}$. Substituting into~\eqref{eq:abelian-moment} yields
+\begin{equation}
+\label{eq:BH-proof}
+\tr(A^2)
+\le \frac{h n^2 + (h - d_H)(Nn - n^2)}{N^2}
+= \frac{hNn - d_H(N-n)n}{N^2}
+= \frac{h(N-r)}{N} - \frac{d_H r(N-r)}{N^2} = B_H.
+\end{equation}
+Notice that $0\le d_H\le h$ and $0\le r\le N$, so $B_H = \frac{N-r}{N}\bigl(h - \frac{d_H r}{N}\bigr) \ge 0$.
+
+\smallskip
+\noindent\emph{Proof of~(a):} The multiplicity of eigenvalue $1$ of $A$ equals $\dim\ker V$ and is bounded above by $\tr(A^2)\le B_H$. Therefore
+\[
+\rank V = h - \dim\ker V \ge h - B_H = \frac{rh}{N} + \frac{d_H r(N-r)}{N^2}.
+\]
+Taking the integer ceiling proves~\eqref{eq:deficit-rank}.
+
+\smallskip
+\noindent\emph{Proof of~(b):} List the eigenvalues of $A$ in descending order as $1\ge a_1\ge a_2\ge \cdots\ge a_h\ge 0$. Then the descending eigenvalues of $V^*V = I_h - A$ are $1-a_h \ge \cdots \ge 1-a_1$, so for any integer $0\le t < h - B_H$ (which implies $t<h$ since $B_H\ge 0$),
+\[
+\sigma_{t+1}(V)^2 = 1 - a_{h-t}.
+\]
+Since the $h-t$ eigenvalues $a_1,\ldots,a_{h-t}$ are all at least $a_{h-t}\ge 0$, we obtain
+\[
+(h - t) a_{h-t}^2 \le \sum_{j=1}^{h-t} a_j^2 \le \tr(A^2) \le B_H.
+\]
+The hypothesis $t < h - B_H$ ensures $h - t > B_H \ge 0$ (and also $t < \rank V \le \min(r,h)$ by~(a)), so $a_{h-t} \le \sqrt{B_H/(h-t)} < 1$, giving
+\[
+\sigma_{t+1}(V) = \sqrt{1 - a_{h-t}} \ge \left(1 - \sqrt{\frac{B_H}{h - t}}\right)^{1/2} > 0.
+\]
+For any $W\in\C^{r\times h}$ of rank at most $t$, let $E\subseteq\C^h$ be the $(t+1)$-dimensional span of the top $t+1$ right singular vectors of $V$. Because $\rank(W|_E)\le t < \dim E$, there exists a unit vector $x\in E$ with $Wx=0$; hence $\|(V-W)x\|_2 = \|Vx\|_2 \ge \sigma_{t+1}(V)$, proving~\eqref{eq:deficit-gap}.
+
+\smallskip
+\noindent\emph{Proof of~(c):} Under canonical Pontryagin biduality $G\cong\widehat{\widehat{G}}$, the transpose $U^T$ is the unitary character table of $\widehat{G}$. Applying~(a) and~(b) to $V^T = U^T[H,R]$, which has the same rank, nonzero singular values, and operator norm as $V$, proves~\eqref{eq:deficit-dual}.
+\end{proof}
+
+\begin{remark}[Boundary cases and normalization]
+\label{rem:endpoints}
+\begin{enumerate}[label=(\arabic*),leftmargin=2em]
+\item \emph{Full and singleton sets:} When $r=N$, $B_H=0$ and Theorem~\ref{thm:deficit} recovers $\rank V=h$ and $\sigma_{t+1}(V)=1$ for all $0\le t<h$. When $h=N$, $d_H=0$ gives $\rank V=r$, while the dual bound~(c) gives $\sigma_{t+1}(V)=1$ for all $0\le t<r$. When $h=1$ (a singleton column), $d_H=1$, $B_H=(N-r)^2/N^2$, and~\eqref{eq:deficit-gap} at $t=0$ recovers the exact column norm $\|V\|_2=\sqrt{r/N}$.
+\item \emph{Unnormalized tables:} For the unnormalized character table $F = \sqrt{N}\,U$, exact ranks are identical, and for any rank-at-most-$t$ approximant $Z$ to $F[R,H]$ applying~\eqref{eq:deficit-gap} to $W = N^{-1/2}Z$ multiplies the operator-norm lower bound by $\sqrt{N}$ (and more generally by $|\alpha|$ under scalar rescaling $\alpha U$).
+\item \emph{Non-positivity in finite characteristic:} Theorem~\ref{thm:deficit} relies on complex positivity of $A$ and does not assert a general positive-characteristic rank or gap transfer.
+\end{enumerate}
+\end{remark}
+
+\section{Consequences: $p$-groups, $2$-group critical gaps, and cut-rank sums}
+\label{sec:consequences}
+
+\begin{proposition}[Translation stabilizers and $p$-group blocks]
+\label{prop:stabilizer}
+Let $G$ be a finite abelian group of order $N\ge 2$ and $H\subseteq G$ nonempty of size $h$.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item $d_H > 0$ if and only if $H$ has trivial translation stabilizer $\{s\in G : H+s=H\}=\{0\}$.
+\item If $\gcd(h,N)=1$, or if $G$ is an abelian $p$-group ($N=p^m$) with $p\nmid h$, then $d_H\ge 1$.
+\item Consequently, for any $s\times s$ submatrix $V=U[R,H]$ of the character table of an abelian $p$-group with $p\nmid s$,
+\begin{equation}
+\label{eq:pgroup-sq}
+\rank V \ge \left\lceil \frac{s^2}{N} + \frac{s(N-s)}{N^2}\right\rceil.
+\end{equation}
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+For $s\neq 0$, $c_H(s)=h$ iff $H+s=H$, giving~(a). If $H+s=H$ for $s\neq 0$, then $H$ is a union of cosets of $\langle s\rangle$, so $\ord(s)\mid h$ and $\ord(s)\mid N$; this is impossible if $\gcd(h,N)=1$, and impossible in a $p$-group (where $p\mid\ord(s)$) if $p\nmid h$, proving~(b). Substituting $r=h=s$ and $d_H\ge 1$ into~\eqref{eq:deficit-rank} gives~\eqref{eq:pgroup-sq}.
+\end{proof}
+
+\begin{example}
+In any abelian $2$-group of order $N=64$ (for instance $\Z/64\Z$ or $(\Z/2\Z)^6$), a $21\times 21$ block satisfies~\eqref{eq:pgroup-sq} with interior quantity $21^2/64 + 21\cdot 43/4096 = 29127/4096 > 7$, forcing $\rank V \ge 8$, whereas the classical flat-unitary baseline~\eqref{eq:flat-baseline} gives only $\lceil 441/64\rceil = 7$.
+\end{example}
+
+\begin{corollary}[Critical-rectangle singular-value gap for all abelian $2$-groups]
+\label{cor:2group-gap}
+Let $G$ be \emph{any} finite abelian $2$-group of order $N=4L\ge 8$ (cyclic or noncyclic), and let $R\subseteq\widehat{G}$, $H\subseteq G$ have $|R|=2L-1$ and $|H|=2L+1$. Then
+\begin{equation}
+\label{eq:2group-gap}
+\sigma_{L+1}(U[R,H]) \ge \delta_N := \left(1 - \sqrt{\frac{B_L}{L+1}}\right)^{1/2} > 0,
+\end{equation}
+where $B_L = L + \frac{3}{4} + \frac{1}{4L} + \frac{1}{16L^2}$. Asymptotically, $\delta_N \sim (2N)^{-1/2}$ as $N\to\infty$.
+\end{corollary}
+
+\begin{proof}
+Because $h=2L+1$ is odd, Proposition~\ref{prop:stabilizer}(b) yields $d_H\ge 1$, so $B_H \le B_L < L+1$ by~\eqref{eq:BL-bound}. Setting $t=L < h - B_L$ in~\eqref{eq:deficit-gap} gives~\eqref{eq:2group-gap}. Since $L+1-B_L = \frac{1}{4} - \frac{1}{4L} - \frac{1}{16L^2} \to \frac{1}{4}$, we have $1 - \sqrt{B_L/(L+1)} = 1 - \sqrt{1 - (L+1-B_L)/(L+1)} \sim \frac{1}{8L} = \frac{1}{2N}$, so $\delta_N\sim (2N)^{-1/2}$.
+\end{proof}
+
+Finally, we examine the total upper-cut rank sum $S(M) = \sum_{k=1}^{N-1}\rank M[0{:}k,\, k{:}N]$ for dyadic Fourier matrices.
+
+\begin{proposition}[Upper-cut rank sums and closed-form bit-reversal profile]
+\label{prop:rank-sums}
+Let $N=2^m$ ($m\ge 0$) and let $M = P_\rho F_N P_\sigma^T$ for arbitrary $\rho,\sigma\in S_N$.
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item For every odd cut $1\le k<N$,
+\begin{equation}
+\label{eq:odd-cut-lb}
+\rank M[0{:}k,\, k{:}N] \ge \left\lceil \frac{k(N-k)(N+1)}{N^2}\right\rceil,
+\end{equation}
+while for every even cut $\rank M[0{:}k,\, k{:}N]\ge \lceil k(N-k)/N\rceil$. In particular, $S(M)\ge (N^2-1)/6$.
+\item For double bit-reversal $Q_N$, the upper-cut rank sum $S_N := S(Q_N)$ satisfies
+\begin{equation}
+\label{eq:SN-rec}
+S_N = \frac{N^2}{8} + \frac{N}{4} + 4S_{N/4}\quad (N\ge 4),\qquad S_1=0,\quad S_2=1,
+\end{equation}
+with exact closed form
+\begin{equation}
+\label{eq:SN-closed}
+S_N =
+\begin{cases}
+\dfrac{N^2}{6} + N\left(\dfrac{m}{8} - \dfrac{1}{6}\right), & m\text{ even},\\[8pt]
+\dfrac{N^2}{6} + N\left(\dfrac{m}{8} + \dfrac{1}{24}\right), & m\text{ odd}.
+\end{cases}
+\end{equation}
+\item For $N\in\{1,2,4,8,16\}$, double bit-reversal attains the pointwise lower bound at \emph{every} cut $k$, yielding the exact global minima $\min_{\rho,\sigma} S(P_\rho F_N P_\sigma^T) = 0, 1, 3, 14, 48$, respectively. At $N=32$, the pointwise lower bounds sum to $182$ while $S_{32}=192$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+For odd $k$ in a dyadic group, $h=N-k$ is odd, so Proposition~\ref{prop:stabilizer}(b) gives $d_H\ge 1$, and~\eqref{eq:deficit-rank} gives $\lceil k(N-k)/N + k(N-k)/N^2\rceil$, which is~\eqref{eq:odd-cut-lb}. Summing the unrounded baseline $k(N-k)/N$ over $1\le k<N$ gives $(N^2-1)/6$, proving~(a).
+
+For~(b), let $N=4L\ge 4$. By Lemma~\ref{lem:bitrev-rec}, the even cuts $k=2a$ ($1\le a\le L$) contribute $\sum_{a=1}^L(a + r_L(a))$ and the odd cuts $k=2a+1$ ($0\le a\le L-1$) contribute $\sum_{a=0}^{L-1}(a+1+r_L(a))$. By reflection~\eqref{eq:reflection}, $S_N$ equals twice this combined sum minus the middle term $r_N(2L)=L$:
+\begin{align*}
+S_N &= 2\left(\sum_{a=1}^L a + \sum_{a=0}^{L-1}(a+1) + 2\sum_{a=1}^{L-1} r_L(a)\right) - L\\
+&= 2L(L+1) - L + 4S_L = 2L^2 + L + 4S_L = \frac{N^2}{8} + \frac{N}{4} + 4S_{N/4},
+\end{align*}
+using $r_L(0)=r_L(L)=0$. Induction on $m$ (checking $m=0$: $1/6-1/6=0$; $m=1$: $4/6 + 2(1/8+1/24)=1$; and the step $m\mapsto m+2$ where $N\mapsto 4N$) immediately yields~\eqref{eq:SN-closed}. Direct evaluation of~\eqref{eq:bitrev-rec} and~\eqref{eq:odd-cut-lb} gives Table~\ref{tab:profiles}, proving~(c).
+\end{proof}
+
+\begin{table}[ht]
+\centering
+\caption{Exact dyadic Fourier quasiseparable minima $q_{\min}$, bit-reversal cut-rank sums $S_N$, and sums of the pointwise lower bounds~\eqref{eq:odd-cut-lb} and~\eqref{eq:flat-baseline}.}
+\label{tab:profiles}
+\begin{tabular}{rrrrrl}
+\toprule
+$N=2^m$ & $q_{\min}$ & Half-square min & Pointwise LB sum & $S_N$ & Bit-reversal upper-cut profile $(r_N(k))_{k=1}^{N-1}$ \\
+\midrule
+$1$ & $0$ & --- & $0$ & $0$ & empty \\
+$2$ & $1$ & $1$ & $1$ & $1$ & $(1)$ \\
+$4$ & $1$ & $1$ & $3$ & $3$ & $(1,1,1)$ \\
+$8$ & $3$ & $2$ & $14$ & $14$ & $(1,2,3,2,3,2,1)$ \\
+$16$ & $5$ & $4$ & $48$ & $48$ & $(1,2,3,3,4,4,5,4,5,4,4,3,3,2,1)$ \\
+$32$ & $9$ & $8$ & $182$ & $192$ & max $9$ at $k\in\{15,17\}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Relation to prior work and open problems}
+\label{sec:prior}
+
+We summarize the exact boundary between Theorems~\ref{thm:minimax}--\ref{thm:deficit} and existing results in matrix analysis and harmonic analysis:
+\begin{itemize}[leftmargin=1.5em]
+\item \emph{Rank-deficient Fourier submatrices and bit-reversal hierarchies:} Delvaux and Van Barel~\cite{DV08} (see also~\cite{DV07} for Kronecker products) establish the simultaneous rank-one subgroup hierarchy and cyclic digit-reversal ordering (cf.~\cite[Eq.~(15) and Lemma~7]{DV08}), together with sharp one-vector support uncertainty~\cite[Theorem~9 and Remark~10]{DV08}. At $N=8$, their one-vector frontier already implies that every $3\times 5$ block has rank $3$ (a $5\times 3$ block of rank $\le 2$ would yield a vector of support $\le 3$ with Fourier support $\le 3$, contradicting the frontier $4$). For $N=4L\ge 16$, however, one-vector support uncertainty at a hypothetical rank-$L$ critical block does not rule out rank $L$; Theorem~\ref{thm:minimax} supplies the universal all-$N$ lower bound and exact $+1$ quasiseparable minimax.
+\item \emph{Flat-unitary and uncertainty-based rank bounds:} The classical rank baseline $\rank V\ge rh/N$ for flat unitaries is recorded in de Wolf~\cite[Theorem~1]{deW06} (credited to Lokam); Borodin, Razborov, and Smolensky~\cite[Theorem~10]{BRS93} prove a splitting-field bound $\rank A[V,W]\ge |V||W|/(2N\log(2N/|W|))$ valid in positive characteristic as well (weaker than $rh/N$ over $\C$). Sharp one-vector support inequalities on finite abelian groups appear in Meshulam~\cite{Mes06}, Bonami and Ghobber~\cite{BG13}, and Feng, Hollmann, and Xiang~\cite{FHX18}; projection and Hilbert--Schmidt uncertainty tools appear in Alagic and Russell~\cite{AR08} and Akemann and Weaver~\cite{AW15}. The maximum translation-overlap statistic $\rho(H)=\max_{s\neq 0}|H\cap(H+s)|$ (so $d_H=h-\rho(H)$) is studied by Shkredov~\cite[Eq.~(4)]{Shk24}. What is new in Theorem~\ref{thm:deficit} is the explicit autocorrelation-deficit rank improvement~\eqref{eq:deficit-rank} and interior singular-value lower bound~\eqref{eq:deficit-gap} uniformly over arbitrary subsets $R,H$ (contrast Barnett~\cite{Bar20}, which bounds the \emph{smallest} singular value $\sigma_{\min}$ of contiguous blocks).
+\item \emph{Quasiseparable order vs.\ arithmetic complexity:} The invariant $q(A)$ is the standard quasiseparable order~\cite{PSV23}. Note that high off-diagonal cut rank alone does not imply an arithmetic complexity lower bound (even a permutation matrix can have large $q(P)$ while applying in $O(N)$ operations).
+\end{itemize}
+
+\subsection*{Open problems}
+\begin{enumerate}[label=(\arabic*),leftmargin=2em]
+\item \emph{Noncyclic abelian $2$-groups:} Corollary~\ref{cor:2group-gap} proves the same $N/4+1$ critical-corner lower bound for every abelian $2$-group of order $N=2^m\ge 8$. Does every noncyclic abelian $2$-group admit independent row/column orderings achieving $q(P_\rho U P_\sigma^T)=N/4+1$?
+\item \emph{Exact minimum upper-cut rank sums for $N\ge 32$:} Determine $\min_{\rho,\sigma} S(P_\rho F_N P_\sigma^T)$ for $N=2^m\ge 32$ (already at $N=32$, the pointwise lower sum is $182$ while double bit-reversal gives $192$).
+\item \emph{Non-dyadic and odd-prime-power Fourier matrices:} Determine $\min_{\rho,\sigma} q(P_\rho F_N P_\sigma^T)$ for $N=p^m$ (odd prime $p$) and general composite $N$.
+\item \emph{Positive characteristic:} Determine when the $+1$ critical-rectangle shift persists for $F_N$ over fields of prime characteristic $\ell\nmid N$.
+\end{enumerate}
+
+\section*{Data and code availability}
+All verification artifacts are publicly available at
+\begin{center}
+\url{https://github.com/AgentSlop-Si/fourier-endpoint-minimax}
+\end{center}
+and consist of:
+\begin{enumerate}[label=(\arabic*),leftmargin=2em]
+\item A standalone Python verification script (\texttt{verify\_endpoint\_minimax.py}, standard library only) performing exact cyclotomic-field Gaussian elimination over $\Q[x]/(\Phi_N(x))$ to verify all bit-reversal cuts for $N\in\{1,2,4,8,16\}$, all $3{,}136$ critical $3\times 5$ blocks and all $4{,}900$ half-size $4\times 4$ blocks of $F_8$, even-even rank-$N/4$ blocks for $N\in\{4,8,16\}$, all $4{,}468$ nonempty submatrices across $C_2\times C_2$, $C_3$, $C_4$, and $C_6$ (verifying the exact second-moment identity~\eqref{eq:abelian-moment} and strict improvements over~\eqref{eq:flat-baseline}), and the exact rational identities for $B_L$, Table~\ref{tab:profiles}, and~\eqref{eq:SN-closed} up to $N=4096$.
+\item A zero-dependency Lean~4 formal verification file (\texttt{FourierEndpointMinimax.lean}, verified in Lean~4.36.0 using core \texttt{Init} only, with no \texttt{sorry} and pure kernel reduction) symbolically proving the strict critical-rectangle moment bound $B_L < L+1$ for all $L\ge 2$ in~\eqref{eq:BL-bound}, the exact autocorrelation-deficit moment algebra~\eqref{eq:BH-proof} and $B_H\ge 0$ for all finite abelian parameters, odd-cardinality non-invariance under nonzero translations in $\Z/2^m\Z$, the bit-reversal recurrence upper bound $r_N(k)\le N/4+1$ and attainment $r_N(N/2-1)=N/4+1$ for all $m\ge 3$ (Theorem~\ref{thm:minimax}), and the exact closed-form bit-reversal cut-rank sum~\eqref{eq:SN-closed} for all $m\ge 0$ (Proposition~\ref{prop:rank-sums}); and kernel-verifying Table~\ref{tab:profiles} (including $N=32$ sum $182$ vs.\ $192$), the $N=64, s=21$ improvement, exact cyclotomic-field ($\Q[x]/(x^4+1)$) bit-reversal cut ranks and rank-$2$ half-square of $F_8$, and exhaustive autocorrelation-deficit checks over $C_2\times C_2$, $C_3$, and $C_4$.
+\end{enumerate}
+
+\bibliographystyle{amsplain}
+\bibliography{references}
+
+\end{document}
